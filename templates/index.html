@@ -42,13 +42,13 @@
                     <input type="text" class="form-control" name="subject" placeholder="e.g. Cyberpunk street market at night OR Python data analysis guide" value="{{ data.get('subject', '') }}" required>
                 </div>
 
-                <!-- Negative Prompt (Both Image & Text) -->
+                <!-- Negative Prompt -->
                 <div class="mb-3">
                     <label class="form-label">Negative Prompt / Elements to Exclude</label>
                     <input type="text" class="form-control" name="negative_prompt" placeholder="e.g. text, blur, extra limbs, low quality OR jargon, intro fluff" value="{{ data.get('negative_prompt', '') }}">
                 </div>
 
-                <!-- Image AI Specific Fields -->
+                <!-- Image AI Fields -->
                 <div id="imageFields">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
@@ -96,7 +96,6 @@
                         </div>
                     </div>
 
-                    <!-- Advanced Parameters -->
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label">Stylize (--s 0-1000)</label>
@@ -114,13 +113,13 @@
 
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" name="quality" id="qualityCheck" checked>
-                        <label class="form-check-label text-slate-200" for="qualityCheck" style="color: #cbd5e1;">
+                        <label class="form-check-label" for="qualityCheck" style="color: #cbd5e1;">
                             Add 8K Resolution & Ultra-Detail Boosters (--v 6.0)
                         </label>
                     </div>
                 </div>
 
-                <!-- Text AI Specific Fields -->
+                <!-- Text AI Fields -->
                 <div id="textFields" style="display: none;">
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
@@ -143,14 +142,24 @@
             </form>
         </div>
 
-        <!-- Output Section -->
+        <!-- Generated Prompt Output -->
         {% if prompt %}
-        <div class="card p-4 shadow-lg mb-5">
+        <div class="card p-4 shadow-lg mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0 text-white">Generated Master Prompt:</h5>
                 <button class="btn btn-sm btn-outline-info" onclick="copyPrompt()">📋 Copy to Clipboard</button>
             </div>
             <div class="output-box" id="promptText">{{ prompt }}</div>
+        </div>
+        {% endif %}
+
+        <!-- AI Image Preview -->
+        {% if image_url %}
+        <div class="card p-4 shadow-lg mb-5">
+            <h5 class="fw-bold mb-3 text-white">🎨 AI Generated Preview:</h5>
+            <div class="text-center">
+                <img src="{{ image_url }}" alt="AI Generated Image" class="img-fluid rounded-3 shadow" style="max-height: 450px; width: 100%; object-fit: cover;">
+            </div>
         </div>
         {% endif %}
     </div>
