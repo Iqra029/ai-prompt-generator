@@ -1,3 +1,4 @@
+import urllib.parse
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -16,7 +17,6 @@ def build_midjourney_prompt(subject, style, lighting, camera, aspect_ratio, qual
     
     base_prompt = ", ".join(prompt_parts)
     
-    # Parameter flags
     params = []
     if aspect_ratio:
         params.append(f"--ar {aspect_ratio}")
@@ -51,6 +51,7 @@ def build_text_ai_prompt(subject, style, tone, output_format, negative_prompt):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     generated_prompt = ""
+    image_url = ""
     form_data = {}
     
     if request.method == 'POST':
@@ -76,10 +77,13 @@ def index():
                     subject, style, lighting, camera, aspect_ratio, 
                     quality, negative_prompt, stylize, chaos, custom_params
                 )
+                # Generate live preview image URL via Pollinations
+                encoded_prompt = urllib.parse.quote(f"{subject}, {style}, {lighting}, 8k quality photorealistic")
+                image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1024&height=576&nologo=true"
             else:
                 generated_prompt = build_text_ai_prompt(subject, style, tone, output_format, negative_prompt)
                 
-    return render_template('index.html', prompt=generated_prompt, data=form_data)
+    return render_template('index.html', prompt=generated_prompt, image_url=image_url, data=form_data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
