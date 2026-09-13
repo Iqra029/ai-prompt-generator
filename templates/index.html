@@ -6,62 +6,16 @@
     <title>AI Master Prompt Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #0b0f19;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .card {
-            background-color: #151d30;
-            border: 1px solid #2a3756;
-            border-radius: 14px;
-        }
-        /* Fix label contrast */
-        .form-label {
-            color: #e2e8f0 !important;
-            font-weight: 600;
-        }
-        .text-secondary-custom {
-            color: #94a3b8;
-        }
-        .form-control, .form-select {
-            background-color: #0b0f19;
-            border: 1px solid #334155;
-            color: #f8fafc;
-        }
-        .form-control::placeholder {
-            color: #64748b;
-        }
-        .form-control:focus, .form-select:focus {
-            background-color: #0b0f19;
-            color: #ffffff;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
-        }
-        .btn-custom {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            border: none;
-            color: white;
-            font-weight: 700;
-            border-radius: 10px;
-            transition: all 0.2s ease-in-out;
-        }
-        .btn-custom:hover {
-            background: linear-gradient(135deg, #4f46e5, #9333ea);
-            transform: translateY(-1px);
-            color: white;
-        }
-        .output-box {
-            background-color: #060911;
-            border: 1px solid #1e293b;
-            border-radius: 10px;
-            padding: 18px;
-            font-family: 'Courier New', Courier, monospace;
-            color: #38bdf8;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 1.05rem;
-        }
+        body { background-color: #0b0f19; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card { background-color: #151d30; border: 1px solid #2a3756; border-radius: 14px; }
+        .form-label { color: #e2e8f0 !important; font-weight: 600; }
+        .text-secondary-custom { color: #94a3b8; }
+        .form-control, .form-select { background-color: #0b0f19; border: 1px solid #334155; color: #f8fafc; }
+        .form-control::placeholder { color: #64748b; }
+        .form-control:focus, .form-select:focus { background-color: #0b0f19; color: #ffffff; border-color: #8b5cf6; box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25); }
+        .btn-custom { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; color: white; font-weight: 700; border-radius: 10px; transition: all 0.2s ease-in-out; }
+        .btn-custom:hover { background: linear-gradient(135deg, #4f46e5, #9333ea); transform: translateY(-1px); color: white; }
+        .output-box { background-color: #060911; border: 1px solid #1e293b; border-radius: 10px; padding: 18px; font-family: 'Courier New', Courier, monospace; color: #38bdf8; white-space: pre-wrap; word-break: break-word; font-size: 1.05rem; }
     </style>
 </head>
 <body class="py-5">
@@ -86,6 +40,12 @@
                 <div class="mb-3">
                     <label class="form-label">2. Core Subject / Topic</label>
                     <input type="text" class="form-control" name="subject" placeholder="e.g. Cyberpunk street market at night OR Python data analysis guide" value="{{ data.get('subject', '') }}" required>
+                </div>
+
+                <!-- Negative Prompt (Both Image & Text) -->
+                <div class="mb-3">
+                    <label class="form-label">Negative Prompt / Elements to Exclude</label>
+                    <input type="text" class="form-control" name="negative_prompt" placeholder="e.g. text, blur, extra limbs, low quality OR jargon, intro fluff" value="{{ data.get('negative_prompt', '') }}">
                 </div>
 
                 <!-- Image AI Specific Fields -->
@@ -133,6 +93,22 @@
                                 <option value="1:1">1:1 (Square)</option>
                                 <option value="4:5">4:5 (Instagram Post)</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Parameters -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Stylize (--s 0-1000)</label>
+                            <input type="number" class="form-control" name="stylize" min="0" max="1000" value="{{ data.get('stylize', '100') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Chaos (--c 0-100)</label>
+                            <input type="number" class="form-control" name="chaos" min="0" max="100" value="{{ data.get('chaos', '0') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Custom Parameters</label>
+                            <input type="text" class="form-control" name="custom_params" placeholder="e.g. --tile --weird 250" value="{{ data.get('custom_params', '') }}">
                         </div>
                     </div>
 
