@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Master Prompt Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            background-color: #151d30;
+            border: 1px solid #2a3756;
+            border-radius: 14px;
+        }
+        /* Fix label contrast */
+        .form-label {
+            color: #e2e8f0 !important;
+            font-weight: 600;
+        }
+        .text-secondary-custom {
+            color: #94a3b8;
+        }
+        .form-control, .form-select {
+            background-color: #0b0f19;
+            border: 1px solid #334155;
+            color: #f8fafc;
+        }
+        .form-control::placeholder {
+            color: #64748b;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #0b0f19;
+            color: #ffffff;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25);
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #4f46e5, #9333ea);
+            transform: translateY(-1px);
+            color: white;
+        }
+        .output-box {
+            background-color: #060911;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 18px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #38bdf8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body class="py-5">
+    <div class="container" style="max-width: 820px;">
+        <div class="text-center mb-4">
+            <h1 class="fw-bold text-white mb-2">⚡ AI Master Prompt Generator</h1>
+            <p class="text-secondary-custom fs-5">Transform simple ideas into structured, high-performing prompts for Midjourney, ChatGPT & DALL-E.</p>
+        </div>
+
+        <div class="card p-4 shadow-lg mb-4">
+            <form method="POST">
+                <!-- Target AI Selection -->
+                <div class="mb-3">
+                    <label class="form-label">1. Select AI Generator</label>
+                    <select class="form-select" name="ai_tool" id="aiToolSelect" onchange="toggleFields()">
+                        <option value="midjourney" {% if data.get('ai_tool') == 'midjourney' %}selected{% endif %}>Midjourney / DALL-E (Image AI)</option>
+                        <option value="chatgpt" {% if data.get('ai_tool') == 'chatgpt' %}selected{% endif %}>ChatGPT / Claude (Text AI)</option>
+                    </select>
+                </div>
+
+                <!-- Main Subject -->
+                <div class="mb-3">
+                    <label class="form-label">2. Core Subject / Topic</label>
+                    <input type="text" class="form-control" name="subject" placeholder="e.g. Cyberpunk street market at night OR Python data analysis guide" value="{{ data.get('subject', '') }}" required>
+                </div>
+
+                <!-- Image AI Specific Fields -->
+                <div id="imageFields">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Visual Style</label>
+                            <select class="form-select" name="style">
+                                <option value="None">Default / Photorealistic</option>
+                                <option value="Cyberpunk">Cyberpunk / Neon</option>
+                                <option value="Minimalist 3D Vector">Minimalist 3D Vector</option>
+                                <option value="Anime / Studio Ghibli">Anime / Studio Ghibli</option>
+                                <option value="Oil Painting">Classic Oil Painting</option>
+                                <option value="Cinematic Dark Fantasy">Cinematic Dark Fantasy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Lighting & Atmosphere</label>
+                            <select class="form-select" name="lighting">
+                                <option value="None">Default</option>
+                                <option value="Golden Hour Sunset">Golden Hour Sunset</option>
+                                <option value="Dramatic Volumetric Studio Light">Dramatic Volumetric Studio Light</option>
+                                <option value="Moody Neon Glow">Moody Neon Glow</option>
+                                <option value="Soft Natural Window Light">Soft Natural Window Light</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Camera Angle / Shot Type</label>
+                            <select class="form-select" name="camera">
+                                <option value="None">Default</option>
+                                <option value="Wide Angle Cinematic">Wide Angle Cinematic</option>
+                                <option value="Macro Close-Up Detail">Macro Close-Up Detail</option>
+                                <option value="Drone Aerial Overhead">Drone Aerial Overhead</option>
+                                <option value="Eye-Level Portrait">Eye-Level Portrait</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Aspect Ratio</label>
+                            <select class="form-select" name="aspect_ratio">
+                                <option value="16:9">16:9 (Landscape / Desktop)</option>
+                                <option value="9:16">9:16 (Story / Reel / Mobile)</option>
+                                <option value="1:1">1:1 (Square)</option>
+                                <option value="4:5">4:5 (Instagram Post)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="quality" id="qualityCheck" checked>
+                        <label class="form-check-label text-slate-200" for="qualityCheck" style="color: #cbd5e1;">
+                            Add 8K Resolution & Ultra-Detail Boosters (--v 6.0)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Text AI Specific Fields -->
+                <div id="textFields" style="display: none;">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tone of Voice</label>
+                            <select class="form-select" name="tone">
+                                <option value="Professional & Authoritative">Professional & Authoritative</option>
+                                <option value="Conversational & Engaging">Conversational & Engaging</option>
+                                <option value="Academic & Technical">Academic & Technical</option>
+                                <option value="Persuasive & Sales-Oriented">Persuasive & Sales-Oriented</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Desired Output Format</label>
+                            <input type="text" class="form-control" name="output_format" placeholder="e.g. Markdown table, bulleted list, step-by-step code">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-custom w-100 py-3 fs-5 mt-2">Generate Master Prompt 🚀</button>
+            </form>
+        </div>
+
+        <!-- Output Section -->
+        {% if prompt %}
+        <div class="card p-4 shadow-lg mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-white">Generated Master Prompt:</h5>
+                <button class="btn btn-sm btn-outline-info" onclick="copyPrompt()">📋 Copy to Clipboard</button>
+            </div>
+            <div class="output-box" id="promptText">{{ prompt }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleFields() {
+            const tool = document.getElementById('aiToolSelect').value;
+            const imageFields = document.getElementById('imageFields');
+            const textFields = document.getElementById('textFields');
+
+            if (tool === 'midjourney' || tool === 'dalle') {
+                imageFields.style.display = 'block';
+                textFields.style.display = 'none';
+            } else {
+                imageFields.style.display = 'none';
+                textFields.style.display = 'block';
+            }
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('promptText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Prompt copied to clipboard!');
+            });
+        }
+
+        toggleFields();
+    </script>
+</body>
+</html>
