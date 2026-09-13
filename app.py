@@ -2,8 +2,9 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-def build_midjourney_prompt(subject, style, lighting, camera, aspect_ratio, quality):
+def build_midjourney_prompt(subject, style, lighting, camera, aspect_ratio, quality, negative_prompt, stylize, chaos, custom_params):
     prompt_parts = [subject.strip()]
+    
     if style and style != "None":
         prompt_parts.append(f"in {style} style")
     if lighting and lighting != "None":
@@ -15,24 +16,34 @@ def build_midjourney_prompt(subject, style, lighting, camera, aspect_ratio, qual
     
     base_prompt = ", ".join(prompt_parts)
     
-    # Midjourney specific parameters
+    # Parameter flags
     params = []
     if aspect_ratio:
         params.append(f"--ar {aspect_ratio}")
     if quality:
         params.append("--q 2 --v 6.0")
+    if stylize and stylize != "100":
+        params.append(f"--s {stylize}")
+    if chaos and chaos != "0":
+        params.append(f"--c {chaos}")
+    if negative_prompt.strip():
+        params.append(f"--no {negative_prompt.strip()}")
+    if custom_params.strip():
+        params.append(custom_params.strip())
         
     final_output = base_prompt + (" " + " ".join(params) if params else "")
     return final_output
 
-def build_text_ai_prompt(subject, style, tone, output_format):
+def build_text_ai_prompt(subject, style, tone, output_format, negative_prompt):
     prompt = f"Act as an expert content creator and specialist in {subject.strip()}.\n\n"
     if style and style != "None":
         prompt += f"Writing Style: {style}\n"
     if tone and tone != "None":
         prompt += f"Tone: {tone}\n"
-    if output_format:
-        prompt += f"Output Format: {output_format}\n"
+    if output_format.strip():
+        prompt += f"Output Format: {output_format.strip()}\n"
+    if negative_prompt.strip():
+        prompt += f"Constraints / Exclude: Do NOT include or reference {negative_prompt.strip()}\n"
     
     prompt += f"\nTask: Provide a detailed, highly structured, step-by-step breakdown on '{subject.strip()}'. Avoid generic intro fillers and provide actionable, real-world value immediately."
     return prompt
@@ -52,14 +63,21 @@ def index():
         quality = request.form.get('quality') == 'on'
         tone = request.form.get('tone', '')
         output_format = request.form.get('output_format', '')
+        negative_prompt = request.form.get('negative_prompt', '')
+        stylize = request.form.get('stylize', '100')
+        chaos = request.form.get('chaos', '0')
+        custom_params = request.form.get('custom_params', '')
         
         form_data = request.form
         
         if subject:
             if ai_tool in ['midjourney', 'dalle']:
-                generated_prompt = build_midjourney_prompt(subject, style, lighting, camera, aspect_ratio, quality)
+                generated_prompt = build_midjourney_prompt(
+                    subject, style, lighting, camera, aspect_ratio, 
+                    quality, negative_prompt, stylize, chaos, custom_params
+                )
             else:
-                generated_prompt = build_text_ai_prompt(subject, style, tone, output_format)
+                generated_prompt = build_text_ai_prompt(subject, style, tone, output_format, negative_prompt)
                 
     return render_template('index.html', prompt=generated_prompt, data=form_data)
 
